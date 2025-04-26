@@ -10,18 +10,18 @@ interface RecipeCardProps {
 export default function RecipeCard({ recipe, onSelect }: RecipeCardProps) {
   return (
     <div 
-      className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-white"
+      className="backdrop-blur-sm bg-white/60 dark:bg-black/30 border border-gray-100 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer"
       onClick={() => onSelect(recipe.id)}
     >
-      <div className="p-4">
-        <h3 className="text-xl font-semibold mb-2">{recipe.title}</h3>
-        <p className="text-gray-600 mb-3">{recipe.description}</p>
+      <div className="p-5">
+        <h3 className="text-xl font-medium mb-2">{recipe.title}</h3>
+        <p className="text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">{recipe.description}</p>
         
         <div className="flex justify-between items-center text-sm mb-3">
-          <div className="flex items-center">
+          <div className="flex items-center text-gray-500 dark:text-gray-400">
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
-              className="h-4 w-4 mr-1 text-gray-500" 
+              className="h-4 w-4 mr-1" 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"
@@ -35,25 +35,25 @@ export default function RecipeCard({ recipe, onSelect }: RecipeCardProps) {
             </svg>
             <span>{recipe.cookingTime}</span>
           </div>
-          <div className="text-gray-500">
+          <div className="text-gray-500 dark:text-gray-400">
             {recipe.ingredients.length} ingredients
           </div>
         </div>
         
-        <div className="mb-3">
-          <h4 className="font-medium text-sm mb-1">Ingredients preview:</h4>
-          <ul className="text-sm text-gray-600">
+        <div className="mb-4">
+          <h4 className="font-medium text-sm mb-1 text-gray-700 dark:text-gray-300">Ingredients preview:</h4>
+          <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
             {recipe.ingredients.slice(0, 3).map((ingredient, index) => (
               <li key={index} className="truncate">{ingredient}</li>
             ))}
             {recipe.ingredients.length > 3 && (
-              <li className="text-blue-500">+{recipe.ingredients.length - 3} more</li>
+              <li className="text-blue-500/80">+{recipe.ingredients.length - 3} more</li>
             )}
           </ul>
         </div>
         
         <button 
-          className="w-full py-2 text-center border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition"
+          className="w-full py-2 text-center border border-blue-400/70 text-blue-600 dark:text-blue-400 rounded-md hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onSelect(recipe.id);

@@ -48,45 +48,66 @@ export async function POST(request: Request) {
       Provide 3 different recipes. Make them practical, delicious, and suitable for home cooking.
     `;
 
-    // Get recipe suggestions from OpenAI
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",  // Use appropriate model
-      messages: [
-        {
-          role: "system",
-          content: "You are a professional chef specialized in creating delicious, practical recipes from available ingredients."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-    });
-
-    // Parse the response
-    const content = response.choices[0]?.message?.content || '';
-    const recipes = JSON.parse(content).map((recipe: any, index: number) => ({
-      ...recipe,
-      id: recipe.id || `recipe-${index + 1}`,
-    }));
-
-    // Save recipes to Supabase
-    for (const recipe of recipes) {
-      await supabase.from('recipes').insert({
-        id: recipe.id,
-        title: recipe.title,
-        description: recipe.description,
-        ingredients: recipe.ingredients,
-        instructions: recipe.instructions,
-        cooking_time: recipe.cookingTime,
-        image: recipe.image,
-        dietary_preferences: dietaryPreferences || [],
-        created_at: new Date().toISOString()
+    let recipes;
+    
+    try {
+      // Get recipe suggestions from OpenAI
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",  // Use appropriate model
+        messages: [
+          {
+            role: "system",
+            content: "You are a professional chef specialized in creating delicious, practical recipes from available ingredients."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
       });
+
+      // Parse the response
+      const content = response.choices[0]?.message?.content || '';
+      recipes = JSON.parse(content).map((recipe: any, index: number) => ({
+        ...recipe,
+        id: recipe.id || `recipe-${index + 1}`,
+      }));
+    } catch (apiError: any) {
+      console.error('Error calling OpenAI API:', apiError);
+      
+      // Use sample recipes when API quota is exceeded or other API errors occur
+      console.log('Using sample recipes due to API error');
+      
+      // Fall through to the sample recipes section below
+      throw apiError;
     }
 
-    return NextResponse.json({ recipes });
+    // If we successfully got recipes from OpenAI, save them to Supabase
+    if (recipes && recipes.length > 0) {
+      try {
+        // Save recipes to Supabase
+        for (const recipe of recipes) {
+          await supabase.from('recipes').insert({
+            id: recipe.id,
+            title: recipe.title,
+            description: recipe.description,
+            ingredients: recipe.ingredients,
+            instructions: recipe.instructions,
+            cooking_time: recipe.cookingTime,
+            image: recipe.image,
+            dietary_preferences: dietaryPreferences || [],
+            created_at: new Date().toISOString()
+          });
+        }
+      } catch (dbError) {
+        console.error('Error saving recipes to database:', dbError);
+        // Continue anyway to return recipes to the user
+      }
+
+      return NextResponse.json({ recipes });
+    }
+    
   } catch (error) {
     console.error('Error generating recipes:', error);
     
@@ -162,6 +183,15 @@ export async function POST(request: Request) {
       }
     ];
     
+    // Extract dietaryPreferences from the request, now in this scope
+    let requestDietaryPreferences = [];
+    try {
+      const requestBody = await request.clone().json();
+      requestDietaryPreferences = requestBody.dietaryPreferences || [];
+    } catch (e) {
+      console.error('Error parsing request body:', e);
+    }
+    
     // Even for sample recipes, save them to Supabase
     try {
       for (const recipe of sampleRecipes) {
@@ -173,7 +203,7 @@ export async function POST(request: Request) {
           instructions: recipe.instructions,
           cooking_time: recipe.cookingTime,
           image: recipe.image,
-          dietary_preferences: dietaryPreferences || [],
+          dietary_preferences: requestDietaryPreferences, // Using the extracted value
           created_at: new Date().toISOString()
         });
       }

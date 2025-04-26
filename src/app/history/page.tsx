@@ -35,11 +35,11 @@ export default function HistoryPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Your Recipe History</h1>
+      <div className="mb-10 flex items-center justify-between">
+        <h1 className="text-3xl font-light text-gray-900 dark:text-gray-100">Your Recipe History</h1>
         <Link 
           href="/" 
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center px-4 py-2 bg-blue-500/85 hover:bg-blue-600/90 text-white rounded-md transition-colors"
         >
           Generate New Recipes
         </Link>
@@ -50,8 +50,8 @@ export default function HistoryPage() {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       ) : error ? (
-        <div className="text-center p-10 bg-red-50 rounded-lg">
-          <p className="text-red-600">{error}</p>
+        <div className="text-center p-10 bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm rounded-lg">
+          <p className="text-red-600 dark:text-red-400">{error}</p>
         </div>
       ) : (
         <HistoryList recipes={recipes} />

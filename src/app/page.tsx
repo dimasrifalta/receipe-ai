@@ -57,14 +57,14 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-4 md:p-8 max-w-6xl mx-auto">
-      <header className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2 text-blue-600">AI Recipe Generator</h1>
-        <p className="text-xl text-gray-600 mb-4">
+      <header className="text-center mb-10">
+        <h1 className="text-4xl font-light mb-3 text-blue-600">AI Recipe Generator</h1>
+        <p className="text-xl text-gray-600 mb-4 font-light">
           Turn your available ingredients into delicious meals
         </p>
         <Link 
           href="/history" 
-          className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
+          className="inline-flex items-center px-4 py-2 bg-transparent border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
         >
           View Recipe History
         </Link>
@@ -77,7 +77,7 @@ export default function Home() {
         />
       ) : (
         <>
-          <section className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <section className="backdrop-blur-sm bg-white/50 dark:bg-black/30 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800 p-6 mb-8">
             <div className="max-w-3xl mx-auto">
               <IngredientInput 
                 ingredients={ingredients} 
@@ -89,15 +89,15 @@ export default function Home() {
                 setDietaryPreferences={setDietaryPreferences} 
               />
               
-              <div className="mt-6 text-center">
+              <div className="mt-8 text-center">
                 <button
                   onClick={handleGenerateRecipes}
                   disabled={isLoading || ingredients.length === 0}
                   className={`
-                    px-6 py-3 rounded font-semibold text-white shadow-sm
+                    px-6 py-3 rounded-md font-medium text-white shadow-sm
                     ${isLoading || ingredients.length === 0 
-                      ? 'bg-gray-400 cursor-not-allowed' 
-                      : 'bg-blue-600 hover:bg-blue-700 transition-colors'}
+                      ? 'bg-gray-400/70 cursor-not-allowed' 
+                      : 'bg-blue-500/85 hover:bg-blue-600/90 transition-colors'}
                   `}
                 >
                   {isLoading ? (
@@ -115,7 +115,7 @@ export default function Home() {
               </div>
               
               {error && (
-                <div className="mt-4 p-3 bg-red-100 text-red-700 rounded text-center">
+                <div className="mt-4 p-3 bg-red-50/70 text-red-700 rounded-md text-center">
                   {error}
                 </div>
               )}
@@ -124,7 +124,7 @@ export default function Home() {
           
           {recipes.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-6 text-center">Your Recipe Suggestions</h2>
+              <h2 className="text-2xl font-light mb-6 text-center">Your Recipe Suggestions</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recipes.map((recipe) => (
                   <RecipeCard
