@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import IngredientInput from '@/components/IngredientInput';
 import DietaryPreferences from '@/components/DietaryPreferences';
 import RecipeCard from '@/components/RecipeCard';
@@ -58,9 +59,15 @@ export default function Home() {
     <main className="min-h-screen p-4 md:p-8 max-w-6xl mx-auto">
       <header className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2 text-blue-600">AI Recipe Generator</h1>
-        <p className="text-xl text-gray-600">
+        <p className="text-xl text-gray-600 mb-4">
           Turn your available ingredients into delicious meals
         </p>
+        <Link 
+          href="/history" 
+          className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
+        >
+          View Recipe History
+        </Link>
       </header>
 
       {selectedRecipe ? (

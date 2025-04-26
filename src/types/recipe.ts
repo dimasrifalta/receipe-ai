@@ -6,4 +6,6 @@ export interface Recipe {
   instructions: string[];
   cookingTime: string;
   image?: string;
+  dietary_preferences?: string[];
+  created_at?: string;
 }

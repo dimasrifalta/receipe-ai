@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { supabase } from '@/lib/supabaseClient';
 
 // Initialize OpenAI client
 // Note: You need to add OPENAI_API_KEY to your environment variables
@@ -69,6 +70,21 @@ export async function POST(request: Request) {
       ...recipe,
       id: recipe.id || `recipe-${index + 1}`,
     }));
+
+    // Save recipes to Supabase
+    for (const recipe of recipes) {
+      await supabase.from('recipes').insert({
+        id: recipe.id,
+        title: recipe.title,
+        description: recipe.description,
+        ingredients: recipe.ingredients,
+        instructions: recipe.instructions,
+        cooking_time: recipe.cookingTime,
+        image: recipe.image,
+        dietary_preferences: dietaryPreferences || [],
+        created_at: new Date().toISOString()
+      });
+    }
 
     return NextResponse.json({ recipes });
   } catch (error) {
@@ -145,6 +161,25 @@ export async function POST(request: Request) {
         image: ""
       }
     ];
+    
+    // Even for sample recipes, save them to Supabase
+    try {
+      for (const recipe of sampleRecipes) {
+        await supabase.from('recipes').insert({
+          id: recipe.id,
+          title: recipe.title,
+          description: recipe.description,
+          ingredients: recipe.ingredients,
+          instructions: recipe.instructions,
+          cooking_time: recipe.cookingTime,
+          image: recipe.image,
+          dietary_preferences: dietaryPreferences || [],
+          created_at: new Date().toISOString()
+        });
+      }
+    } catch (dbError) {
+      console.error('Error saving sample recipes to database:', dbError);
+    }
     
     return NextResponse.json({ 
       recipes: sampleRecipes, 
