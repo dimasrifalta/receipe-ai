@@ -15,6 +15,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
     recipes: []
   };
   
+  // Extended mock client with auth methods
   supabaseClient = {
     from: (table) => ({
       select: () => ({
@@ -36,7 +37,37 @@ if (!supabaseUrl || !supabaseAnonKey) {
         mockStorage[table].push(data);
         return { data, error: null };
       }
-    })
+    }),
+    auth: {
+      signUp: ({ email, password }) => {
+        console.log('Mock signup:', email);
+        return Promise.resolve({
+          data: { user: { id: 'mock-user-id', email } },
+          error: null
+        });
+      },
+      signInWithPassword: ({ email, password }) => {
+        console.log('Mock sign in:', email);
+        return Promise.resolve({
+          data: { user: { id: 'mock-user-id', email } },
+          error: null
+        });
+      },
+      signOut: () => {
+        console.log('Mock sign out');
+        return Promise.resolve({ error: null });
+      },
+      getSession: () => {
+        return Promise.resolve({
+          data: { session: null },
+          error: null
+        });
+      },
+      onAuthStateChange: (callback) => {
+        // No-op for mock
+        return { data: { subscription: { unsubscribe: () => {} } } };
+      }
+    }
   };
 } else {
   // Use actual Supabase client if credentials are available
