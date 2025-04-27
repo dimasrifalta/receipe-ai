@@ -28,9 +28,25 @@ export default function HistoryPage() {
     async function fetchRecipeHistory() {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/history');
+        const response = await fetch('/api/history', {
+          // Include credentials to send auth cookies with the request
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         
         if (!response.ok) {
+          // Handle specific error cases
+          if (response.status === 401) {
+            throw new Error('Please log in to view your recipe history');
+          }
+          
+          const errorData = await response.json().catch(() => null);
+          if (errorData?.error) {
+            throw new Error(errorData.error);
+          }
+          
           throw new Error('Failed to fetch recipe history');
         }
         
@@ -38,7 +54,7 @@ export default function HistoryPage() {
         setRecipes(data.recipes || []);
       } catch (err) {
         console.error('Error fetching recipe history:', err);
-        setError('Failed to load recipe history. Please try again later.');
+        setError(err instanceof Error ? err.message : 'Failed to load recipe history. Please try again later.');
       } finally {
         setIsLoading(false);
       }

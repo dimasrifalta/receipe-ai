@@ -18,9 +18,20 @@ export default function RecipePage({ params }: { params: { id: string } }) {
     async function fetchRecipeDetails() {
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/recipe/${id}`);
+        
+        // Check if the user is authenticated
+        const response = await fetch(`/api/recipe/${id}`, {
+          // Include credentials to send cookies with the request
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
         if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Please log in to view this recipe');
+          }
           if (response.status === 404) {
             throw new Error('Recipe not found');
           }

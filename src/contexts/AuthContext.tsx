@@ -19,55 +19,169 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
     async function getInitialSession() {
       setIsLoading(true);
+      console.log('[AuthContext] Getting initial session...');
 
-      const { data, error } = await supabase.auth.getSession();
-      
-      if (!error && data.session) {
-        setSession(data.session);
-        setUser(data.session.user);
+      try {
+        // Try to get a stored session from localStorage first
+        const storedSession = localStorage.getItem('supabase-auth');
+        if (storedSession) {
+          console.log('[AuthContext] Found stored session in localStorage');
+        }
+        
+        const { data, error } = await supabase.auth.getSession();
+        
+        // Debug: Log session data and errors
+        if (error) {
+          console.error('[AuthContext] Error getting initial session:', error);
+        }
+        
+        console.log('[AuthContext] Initial session data:', {
+          hasSession: !!data.session,
+          user: data.session?.user ? {
+            id: data.session.user.id,
+            email: data.session.user.email
+          } : null
+        });
+        
+        if (!error && data.session) {
+          setSession(data.session);
+          setUser(data.session.user);
+          
+          // Store user in localStorage as a backup
+          localStorage.setItem('auth-user', JSON.stringify(data.session.user));
+        } else {
+          // Try to recover user from localStorage if session is missing
+          const storedUser = localStorage.getItem('auth-user');
+          if (storedUser) {
+            console.log('[AuthContext] Recovering user from localStorage');
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+          }
+        }
+      } catch (e) {
+        console.error('[AuthContext] Error in auth initialization:', e);
+      } finally {
+        setIsLoading(false);
+        setAuthInitialized(true);
       }
-
-      setIsLoading(false);
     }
 
     getInitialSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, currentSession) => {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
+      (event, currentSession) => {
+        // Debug: Log auth state changes
+        console.log('[AuthContext] Auth state changed:', { 
+          event, 
+          hasSession: !!currentSession,
+          userId: currentSession?.user?.id
+        });
+        
+        if (currentSession) {
+          setSession(currentSession);
+          setUser(currentSession.user);
+          
+          // Store user in localStorage when auth state changes
+          localStorage.setItem('auth-user', JSON.stringify(currentSession.user));
+        } else if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+          localStorage.removeItem('auth-user');
+        }
+        
         setIsLoading(false);
       }
     );
 
     return () => {
+      console.log('[AuthContext] Unsubscribing from auth changes');
       subscription.unsubscribe();
     };
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    console.log('[AuthContext] Signing up with email:', email);
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
+    
+    // Debug: Log signup result
+    if (error) {
+      console.error('[AuthContext] Signup error:', error);
+    } else {
+      console.log('[AuthContext] Signup successful:', {
+        user: data.user ? { id: data.user.id, email: data.user.email } : null,
+        session: !!data.session
+      });
+      
+      // Set user immediately after successful signup
+      if (data.user) {
+        setUser(data.user);
+        if (data.session) {
+          setSession(data.session);
+        }
+      }
+    }
+    
     return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    console.log('[AuthContext] Signing in with email:', email);
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
+    // Debug: Log signin result
+    if (error) {
+      console.error('[AuthContext] Signin error:', error);
+    } else {
+      console.log('[AuthContext] Signin successful:', {
+        user: data.user ? { id: data.user.id, email: data.user.email } : null,
+        session: !!data.session
+      });
+      
+      // Set user immediately after successful signin
+      if (data.user) {
+        setUser(data.user);
+        if (data.session) {
+          setSession(data.session);
+        }
+      }
+    }
+    
     return { error };
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    console.log('[AuthContext] Signing out...');
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('[AuthContext] Signout error:', error);
+    } else {
+      console.log('[AuthContext] Signout successful');
+      // Clear user and session immediately
+      setUser(null);
+      setSession(null);
+      localStorage.removeItem('auth-user');
+    }
   };
+
+  // Debug: Log the current auth state on every render
+  console.log('[AuthContext] Current state:', {
+    isLoggedIn: !!user,
+    userId: user?.id,
+    hasSession: !!session,
+    isLoading,
+    authInitialized
+  });
 
   const value = {
     session,

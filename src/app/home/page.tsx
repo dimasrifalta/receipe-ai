@@ -10,6 +10,7 @@ import RecipeDetails from '@/components/RecipeDetails';
 import Header from '@/components/Header';
 import { Recipe } from '@/types/recipe';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function HomePage() {
   const [ingredients, setIngredients] = useState<string[]>([]);
@@ -20,12 +21,14 @@ export default function HomePage() {
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
   const { user, isLoading: authLoading, signOut } = useAuth();
   const router = useRouter();
-  
+
   // Check if user is authenticated
   useEffect(() => {
     if (!authLoading && !user) {
-      // Redirect to login if not authenticated
+      console.log('[HomePage] No authenticated user, redirecting to login');
       router.push('/login');
+    } else if (user) {
+      console.log('[HomePage] Authenticated user:', user.id);
     }
   }, [user, authLoading, router]);
 
@@ -35,32 +38,97 @@ export default function HomePage() {
       return;
     }
 
+    // Debug: Log authentication state before making API call
+    console.log('[HomePage] Current auth state before recipe generation:', { 
+      isLoggedIn: !!user, 
+      userId: user?.id,
+      email: user?.email
+    });
+
     setError(null);
     setIsLoading(true);
     setRecipes([]);
     setSelectedRecipeId(null);
 
     try {
+      // Get the current session and token
+      console.log('[HomePage] Getting auth session...');
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('[HomePage] Error getting session:', sessionError);
+        throw new Error('Failed to get authentication session');
+      }
+      
+      if (!sessionData.session) {
+        console.error('[HomePage] No active session found');
+        throw new Error('No active session. Please log in again.');
+      }
+      
+      const token = sessionData.session.access_token;
+      console.log('[HomePage] Session token available:', !!token);
+
+      if (!token) {
+        throw new Error('Authentication token not available. Please log in again.');
+      }
+      
+      // Debug: Log request details
+      console.log('[HomePage] Making request with:', { 
+        ingredients, 
+        dietaryPreferences,
+        authHeader: token ? 'Bearer token included' : 'No token'
+      });
+      
       const response = await fetch('/api/generate-recipes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Include the token in Authorization header
         },
+        credentials: 'include', // Include cookies as well for redundancy
         body: JSON.stringify({
           ingredients,
           dietaryPreferences,
         }),
       });
 
+      // Debug: Log response status
+      console.log('[HomePage] Response status:', response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error('Failed to generate recipes');
+        // Try to parse error response
+        let errorMessage = 'Failed to generate recipes';
+        
+        try {
+          const errorData = await response.json();
+          console.error('[HomePage] API error response:', errorData);
+          if (errorData.error) {
+            errorMessage = errorData.error;
+          }
+        } catch (e) {
+          console.error('[HomePage] Failed to parse error response:', e);
+        }
+        
+        if (response.status === 401) {
+          errorMessage = 'Please log in to generate recipes';
+          // Try to refresh the session
+          const { error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError) {
+            console.error('[HomePage] Failed to refresh session:', refreshError);
+          } else {
+            console.log('[HomePage] Session refreshed, retry might work now');
+          }
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const data = await response.json();
-      setRecipes(data.recipes);
+      const responseData = await response.json();
+      console.log('[HomePage] Received recipes:', responseData.recipes?.length || 0);
+      setRecipes(responseData.recipes);
     } catch (err) {
-      setError('An error occurred while generating recipes. Please try again.');
-      console.error(err);
+      console.error('[HomePage] Recipe generation error:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred while generating recipes. Please try again.');
     } finally {
       setIsLoading(false);
     }
