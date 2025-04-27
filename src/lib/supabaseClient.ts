@@ -16,7 +16,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase credentials not found in environment variables. Check your .env file.');
 }
 
-// Create the real Supabase client
+// Create the client-side Supabase client
 const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
@@ -25,6 +25,7 @@ const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
   }
 });
 
-console.log('Real Supabase client initialized with credentials');
+console.log('Client-side Supabase client initialized with credentials');
 
+// Export the base client for client-side components
 export const supabase = supabaseClient;

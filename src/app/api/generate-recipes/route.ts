@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -23,6 +23,24 @@ export async function POST(request: Request) {
     
     // Get the authenticated user's session
     let userId = null;
+    
+    // Create a server-side Supabase client with cookies
+    const cookieStore = cookies();
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      },
+    });
     
     // Try to get user from token in Authorization header first
     const authHeader = request.headers.get('authorization');
@@ -48,11 +66,6 @@ export async function POST(request: Request) {
     // If no user from token, try the cookies method
     if (!userId) {
       console.log('[API:generate-recipes] Trying cookie-based authentication');
-      const cookieStore = cookies();
-      
-      // Debug: Log cookie names to verify they're being passed correctly
-      const allCookies = cookieStore.getAll();
-      console.log('[API:generate-recipes] Cookies available:', allCookies.map(c => c.name));
       
       // Get user session from cookie
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();

@@ -27,12 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('[AuthContext] Getting initial session...');
 
       try {
-        // Try to get a stored session from localStorage first
-        const storedSession = localStorage.getItem('supabase-auth');
-        if (storedSession) {
-          console.log('[AuthContext] Found stored session in localStorage');
-        }
-        
         const { data, error } = await supabase.auth.getSession();
         
         // Debug: Log session data and errors
@@ -51,20 +45,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!error && data.session) {
           setSession(data.session);
           setUser(data.session.user);
-          
-          // Store user in localStorage as a backup
-          localStorage.setItem('auth-user', JSON.stringify(data.session.user));
         } else {
-          // Try to recover user from localStorage if session is missing
-          const storedUser = localStorage.getItem('auth-user');
-          if (storedUser) {
-            console.log('[AuthContext] Recovering user from localStorage');
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-          }
+          // If no session, ensure user state is cleared
+          setUser(null);
+          setSession(null);
         }
       } catch (e) {
         console.error('[AuthContext] Error in auth initialization:', e);
+        // Clear user and session state on error
+        setUser(null);
+        setSession(null);
       } finally {
         setIsLoading(false);
         setAuthInitialized(true);

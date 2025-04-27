@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Recipe } from '@/types/recipe';
 import RecipeDetails from '@/components/RecipeDetails';
 import Header from '@/components/Header';
+  import { supabase } from '@/lib/supabaseClient';
 
 export default function RecipePage({ params }: { params: { id: string } }) {
   // Safely extract the ID using React.use() to handle the Promise
@@ -17,15 +18,37 @@ export default function RecipePage({ params }: { params: { id: string } }) {
   useEffect(() => {
     async function fetchRecipeDetails() {
       try {
-        setIsLoading(true);
-        
+        const { data: sessionData, error: sessionError } =
+          await supabase.auth.getSession();
+
+        if (sessionError) {
+          console.error('[HomePage] Error getting session:', sessionError);
+          throw new Error('Failed to get authentication session');
+        }
+
+        if (!sessionData.session) {
+          console.error('[HomePage] No active session found');
+          throw new Error('No active session. Please log in again.');
+        }
+
+        const token = sessionData.session.access_token;
+        console.log('[HomePage] Session token available:', !!token);
+
+        if (!token) {
+          throw new Error(
+            'Authentication token not available. Please log in again.'
+          );
+        }
+
         // Check if the user is authenticated
         const response = await fetch(`/api/recipe/${id}`, {
           // Include credentials to send cookies with the request
-          credentials: 'include',
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Include the token in Authorization header
           },
+          credentials: 'include', // Include cookies as well for redundancy
         });
 
         if (!response.ok) {
@@ -76,7 +99,7 @@ export default function RecipePage({ params }: { params: { id: string } }) {
             </Link>
             <Link
               href='/'
-              className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-sm transition-colors font-medium">
+              className='inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-sm transition-colors font-medium'>
               Generate New Recipe
             </Link>
           </div>
@@ -91,7 +114,7 @@ export default function RecipePage({ params }: { params: { id: string } }) {
             <p className='text-red-600 dark:text-red-400'>{error}</p>
             <Link
               href='/history'
-              className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-sm transition-colors font-medium">
+              className='inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-sm transition-colors font-medium'>
               Back to History
             </Link>
           </div>

@@ -39,7 +39,7 @@ export default function Header() {
           <Link
             href='/history'
             className='text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
-            History
+            My Recipes
           </Link>
           {authLoading ? (
             <div className='h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700'></div>
