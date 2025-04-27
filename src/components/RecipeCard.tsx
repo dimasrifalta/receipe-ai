@@ -10,11 +10,11 @@ interface RecipeCardProps {
 export default function RecipeCard({ recipe, onSelect }: RecipeCardProps) {
   return (
     <div 
-      className="backdrop-blur-sm bg-white/60 dark:bg-black/30 border border-gray-100 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer"
+      className="backdrop-blur-sm bg-white/70 dark:bg-black/40 border border-gray-200/70 dark:border-gray-800/50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer"
       onClick={() => onSelect(recipe.id)}
     >
-      <div className="p-5">
-        <h3 className="text-xl font-medium mb-2">{recipe.title}</h3>
+      <div className="p-6">
+        <h3 className="text-xl font-medium mb-2 text-gray-800 dark:text-gray-100">{recipe.title}</h3>
         <p className="text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">{recipe.description}</p>
         
         <div className="flex justify-between items-center text-sm mb-3">
@@ -47,13 +47,13 @@ export default function RecipeCard({ recipe, onSelect }: RecipeCardProps) {
               <li key={index} className="truncate">{ingredient}</li>
             ))}
             {recipe.ingredients.length > 3 && (
-              <li className="text-blue-500/80">+{recipe.ingredients.length - 3} more</li>
+              <li className="text-green-600 dark:text-green-400">+{recipe.ingredients.length - 3} more</li>
             )}
           </ul>
         </div>
         
         <button 
-          className="w-full py-2 text-center border border-blue-400/70 text-blue-600 dark:text-blue-400 rounded-md hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors"
+          className="w-full py-2 text-center border border-green-400/70 text-green-700 dark:text-green-400 rounded-full hover:bg-green-50/50 dark:hover:bg-green-900/20 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onSelect(recipe.id);

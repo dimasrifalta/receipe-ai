@@ -42,8 +42,8 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="backdrop-blur-sm bg-white/60 dark:bg-black/30 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-800/60 p-8 w-full max-w-md mx-auto">
-      <h2 className="text-2xl font-light mb-6 text-center">Log In</h2>
+    <div className="backdrop-blur-sm bg-white/70 dark:bg-black/40 rounded-xl shadow-sm border border-gray-200/70 dark:border-gray-800/50 p-8 w-full max-w-md mx-auto">
+      <h2 className="text-2xl font-light mb-6 text-center text-gray-800 dark:text-gray-100">Log In</h2>
       
       {error && (
         <div className="mb-4 p-3 bg-red-50/70 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-md text-sm">
@@ -62,7 +62,7 @@ export default function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="w-full p-2 border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-black/20 backdrop-blur-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
+            className="w-full p-3 border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-black/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-green-400 dark:focus:ring-green-500"
             disabled={isLoading}
             required
           />
@@ -78,7 +78,7 @@ export default function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
-            className="w-full p-2 border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-black/20 backdrop-blur-sm rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
+            className="w-full p-3 border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-black/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-green-400 dark:focus:ring-green-500"
             disabled={isLoading}
             required
           />
@@ -86,10 +86,10 @@ export default function LoginForm() {
         
         <button
           type="submit"
-          className={`w-full py-2 px-4 rounded-md ${
+          className={`w-full py-3 px-4 rounded-full ${
             isLoading
-              ? 'bg-blue-400/60 cursor-not-allowed'
-              : 'bg-blue-500/85 hover:bg-blue-600/90 transition-colors'
+              ? 'bg-green-500/60 cursor-not-allowed'
+              : 'bg-green-600 hover:bg-green-700 transition-colors'
           } text-white font-medium`}
           disabled={isLoading}
         >
@@ -100,7 +100,7 @@ export default function LoginForm() {
       <div className="mt-6 text-center text-sm">
         <p className="text-gray-600 dark:text-gray-400">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-blue-500/90 hover:text-blue-600 transition-colors">
+          <Link href="/signup" className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors">
             Sign up
           </Link>
         </p>

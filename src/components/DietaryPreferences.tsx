@@ -32,7 +32,7 @@ export default function DietaryPreferences({
 
   return (
     <div className="mb-6">
-      <h2 className="text-xl font-medium mb-2">Dietary Preferences</h2>
+      <h2 className="text-xl font-medium mb-2 text-gray-800 dark:text-gray-100">Dietary Preferences</h2>
       <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">Select any dietary preferences (optional)</p>
       
       <div className="flex flex-wrap gap-2">
@@ -42,7 +42,7 @@ export default function DietaryPreferences({
             onClick={() => togglePreference(preference)}
             className={`px-3 py-1 rounded-full border text-sm transition-colors ${
               dietaryPreferences.includes(preference)
-                ? 'bg-blue-400/85 text-white border-blue-400/60'
+                ? 'bg-green-600 text-white border-green-500'
                 : 'bg-white/50 dark:bg-black/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 border-gray-200/60 dark:border-gray-700/40 hover:bg-gray-100/70 dark:hover:bg-gray-800/30'
             }`}
             aria-pressed={dietaryPreferences.includes(preference)}
