@@ -29,17 +29,18 @@ export async function POST(request: Request) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
     
+    // Fixed: Update Supabase client configuration to match proper type definition
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: false,
         autoRefreshToken: false,
-        detectSessionInUrl: false,
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
+        detectSessionInUrl: false
       },
+      global: {
+        headers: {
+          cookie: cookieStore.toString()
+        }
+      }
     });
     
     // Try to get user from token in Authorization header first
