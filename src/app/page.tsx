@@ -11,6 +11,7 @@ export default function Home() {
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [activeAccordion, setActiveAccordion] = useState<number | null>(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -40,6 +41,7 @@ export default function Home() {
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
+      setIsMenuOpen(false);
     }
   };
 
@@ -79,82 +81,159 @@ export default function Home() {
     <div className='min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900'>
       {/* Navigation */}
       <nav className='backdrop-blur-sm bg-white/70 dark:bg-black/40 border-b border-gray-200/70 dark:border-gray-800/50 fixed w-full top-0 z-10'>
-        <div className='container mx-auto px-4 py-3 flex justify-between items-center'>
-          <div className='flex items-center space-x-2'>
-            <div className='flex items-center'>
-              <div className='w-8 h-8 bg-green-600 dark:bg-green-500 rounded-md flex items-center justify-center mr-2'>
-                <span className='text-white font-medium'>R</span>
+        <div className='container mx-auto px-4 py-3'>
+          <div className='flex justify-between items-center'>
+            <div className='flex items-center space-x-2'>
+              <div className='flex items-center'>
+                <div className='w-8 h-8 bg-green-600 dark:bg-green-500 rounded-md flex items-center justify-center mr-2'>
+                  <span className='text-white font-medium'>R</span>
+                </div>
+                <span className='text-green-800 dark:text-green-400 text-xl font-medium'>
+                  Recipe AI
+                </span>
               </div>
-              <span className='text-green-800 dark:text-green-400 text-xl font-medium'>
-                Recipe AI
-              </span>
+            </div>
+            
+            {/* Desktop navigation */}
+            <div className='hidden md:flex items-center space-x-6'>
+              <button
+                onClick={() => scrollToSection('benefits-section')}
+                className='text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
+                Benefit
+              </button>
+              <button
+                onClick={() => scrollToSection('support-section')}
+                className='text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
+                Support
+              </button>
+              {isLoading ? (
+                <div className='h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700'></div>
+              ) : user ? (
+                <>
+                  <Link
+                    href='/history'
+                    className='text-sm text-green-600 dark:text-green-400 hover:underline'>
+                    My Recipes
+                  </Link>
+                  <span className='text-sm text-gray-600 dark:text-gray-300'>
+                    Hello, {user.email?.split('@')[0]}
+                  </span>
+
+                  <button
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                    className='text-sm px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'>
+                    {isSigningOut ? 'Signing out...' : 'Sign out'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href='/login'
+                    className='text-sm px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
+                    Log in
+                  </Link>
+                  <Link
+                    href='/signup'
+                    className='text-sm px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition-colors'>
+                    Start For Free
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Mobile menu button */}
+            <div className='md:hidden'>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className='text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md p-1'
+                aria-label='Toggle menu'>
+                {isMenuOpen ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
-          <div className='flex items-center space-x-6'>
-            <button
-              onClick={() => scrollToSection('benefits-section')}
-              className='text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
-              Benefit
-            </button>
-            <button
-              onClick={() => scrollToSection('support-section')}
-              className='text-sm text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
-              Support
-            </button>
-            {isLoading ? (
-              <div className='h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700'></div>
-            ) : user ? (
-              <>
-                <Link
-                  href='/history'
-                  className='text-sm text-green-600 dark:text-green-400 hover:underline'>
-                  My Recipes
-                </Link>
-                <span className='text-sm text-gray-600 dark:text-gray-300'>
-                  Hello, {user.email?.split('@')[0]}
-                </span>
 
+          {/* Mobile navigation */}
+          {isMenuOpen && (
+            <div className='mt-3 pb-2 md:hidden'>
+              <div className='flex flex-col space-y-3 pt-2 border-t border-gray-200 dark:border-gray-700'>
                 <button
-                  onClick={handleSignOut}
-                  disabled={isSigningOut}
-                  className='text-sm px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'>
-                  {isSigningOut ? 'Signing out...' : 'Sign out'}
+                  onClick={() => scrollToSection('benefits-section')}
+                  className='text-sm py-2 text-left text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
+                  Benefit
                 </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href='/login'
-                  className='text-sm px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
-                  Log in
-                </Link>
-                <Link
-                  href='/signup'
-                  className='text-sm px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition-colors'>
-                  Start For Free
-                </Link>
-              </>
-            )}
-          </div>
+                <button
+                  onClick={() => scrollToSection('support-section')}
+                  className='text-sm py-2 text-left text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
+                  Support
+                </button>
+                
+                {user ? (
+                  <>
+                    <Link
+                      href='/history'
+                      className='text-sm py-2 text-green-600 dark:text-green-400 hover:underline'
+                      onClick={() => setIsMenuOpen(false)}>
+                      My Recipes
+                    </Link>
+                    <div className='pt-2 border-t border-gray-200 dark:border-gray-700'>
+                      <p className='text-sm text-gray-600 dark:text-gray-300 py-2'>
+                        Hello, {user.email?.split('@')[0]}
+                      </p>
+                      <button
+                        onClick={handleSignOut}
+                        disabled={isSigningOut}
+                        className='text-sm w-full text-left py-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'>
+                        {isSigningOut ? 'Signing out...' : 'Sign out'}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href='/login'
+                      className='text-sm py-2 text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors'
+                      onClick={() => setIsMenuOpen(false)}>
+                      Log in
+                    </Link>
+                    <Link
+                      href='/signup'
+                      className='text-sm py-2 text-green-600 dark:text-green-400 hover:underline'
+                      onClick={() => setIsMenuOpen(false)}>
+                      Start For Free
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className='pt-24 pb-16 px-4 md:px-0 flex flex-col items-center'>
+      <section className='pt-24 pb-16 px-4 md:px-0'>
         <div className='container mx-auto max-w-6xl'>
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 items-center'>
-            <div className='lg:col-span-7'>
-              <h1 className='text-4xl md:text-5xl font-light mb-6 text-gray-800 dark:text-gray-100 leading-tight'>
-                Elevate Your Mealtime with <br />
+            <div className='lg:col-span-7 order-2 lg:order-1'>
+              <h1 className='text-3xl md:text-5xl font-light mb-4 text-gray-800 dark:text-gray-100 leading-tight text-center lg:text-left'>
+                Elevate Your Mealtime with <br className="hidden md:block" />
                 <span className='font-medium text-green-600 dark:text-green-400'>
                   AI-Powered Personalization
                 </span>
               </h1>
-              <p className='text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed'>
+              <p className='text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed text-center lg:text-left'>
                 Effortless Planning, Healthier Eating
               </p>
 
-              <div className='flex flex-wrap gap-4 mb-10'>
+              <div className='flex flex-wrap justify-center lg:justify-start gap-4 mb-10'>
                 <button
                   onClick={handleGetStarted}
                   className='px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full font-medium transition-colors'>
@@ -167,91 +246,84 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className='flex items-center gap-6 flex-wrap'>
-                <div className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm'>
-                  <div className='text-4xl font-bold mb-1 text-green-600'>
-                    95%
-                  </div>
-                  <div className='text-sm text-gray-600 dark:text-gray-400'>
-                    Improved Eating Habits
+              <div className='flex flex-wrap justify-center lg:justify-start items-center gap-4 md:gap-6'>
+                {/* Stat boxes */}
+                <div className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm relative overflow-hidden'>
+                  <div className='text-3xl md:text-4xl font-bold mb-1 text-green-600'>95%</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-400'>Improved Eating Habits</div>
+                  
+                  <div className='mt-3'>
+                    <div className='w-full h-24 md:h-32 relative'>
+                      <Image
+                        src="/img/4.jpg"
+                        alt="Person with reusable grocery bag"
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <div className='bg-green-800 text-white p-4 rounded-xl shadow-sm'>
-                  <div className='text-4xl font-bold mb-1'>30,000+</div>
+                  <div className='text-3xl md:text-4xl font-bold mb-1'>30,000+</div>
                   <div className='text-sm opacity-80'>Happy Users</div>
                 </div>
 
                 <div className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm'>
-                  <div className='text-4xl font-bold mb-1 text-green-600'>
-                    25%
-                  </div>
-                  <div className='text-sm text-gray-600 dark:text-gray-400'>
-                    Saved on Groceries
+                  <div className='text-3xl md:text-4xl font-bold mb-1 text-green-600'>25%</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-400'>Saved on Groceries</div>
+                  
+                  <div className='mt-3'>
+                    <div className='w-full h-24 md:h-32 relative'>
+                      <Image
+                        src="/img/5.jpg"
+                        alt="Grocery bag with vegetables"
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className='lg:col-span-5 grid grid-cols-2 gap-3'>
-              <div className='rounded-xl overflow-hidden h-40'>
-                <div className='w-full h-full bg-green-200 flex items-center justify-center'>
-                  <div className='w-10 h-10 bg-green-600 rounded-full flex items-center justify-center'>
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      className='h-5 w-5 text-white'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z'
-                      />
-                    </svg>
-                  </div>
-                </div>
+            <div className='lg:col-span-5 grid grid-cols-2 gap-4 order-1 lg:order-2 mb-6 lg:mb-0'>
+              {/* Main food image */}
+              <div className='col-span-2 rounded-xl overflow-hidden h-48 md:h-64 relative'>
+                <Image
+                  src="/img/1.jpg"
+                  alt="Delicious healthy meal"
+                  fill
+                  className="object-cover"
+                />
               </div>
-
-              <div className='rounded-xl overflow-hidden row-span-2 h-full'>
-                <div className='w-full h-full bg-gray-200 flex items-center justify-center'>
-                  <div className='w-16 h-16 bg-green-100 rounded-full flex items-center justify-center'>
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      className='h-8 w-8 text-green-600'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
-                      />
-                    </svg>
-                  </div>
-                </div>
+              
+              {/* Secondary food images */}
+              <div className='rounded-xl overflow-hidden h-32 md:h-48 relative'>
+                <Image
+                  src="/img/2.jpg"
+                  alt="Fresh ingredients"
+                  fill
+                  className="object-cover"
+                />
               </div>
-
-              <div className='rounded-xl overflow-hidden h-40'>
-                <div className='w-full h-full bg-green-100 flex items-center justify-center'>
-                  <div className='w-10 h-10 bg-green-600 rounded-full flex items-center justify-center'>
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      className='h-5 w-5 text-white'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z'
-                      />
-                    </svg>
-                  </div>
-                </div>
+              
+              <div className='rounded-xl overflow-hidden h-32 md:h-48 relative'>
+                <Image
+                  src="/img/7.jpg"
+                  alt="Meal preparation"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              
+              {/* Decorative elements */}
+              <div className='absolute -z-10 top-20 right-10 hidden md:block'>
+                <div className='w-12 h-12 rounded-full bg-yellow-100 opacity-70'></div>
+              </div>
+              
+              <div className='absolute -z-10 bottom-40 left-1/4 hidden md:block'>
+                <div className='w-10 h-10 rounded-full bg-green-50 border border-green-200'></div>
               </div>
             </div>
           </div>
@@ -259,154 +331,156 @@ export default function Home() {
       </section>
 
       {/* Recipes Section */}
-      <section className='py-16 px-4 md:px-0'>
+      <section className='py-16 px-4 md:px-0 bg-white dark:bg-gray-900'>
         <div className='container mx-auto max-w-6xl'>
-          <div className='flex justify-between items-center mb-10'>
-            <div>
-              <h2 className='text-3xl font-light text-gray-800 dark:text-gray-100'>
-                Recipes
-              </h2>
-              <p className='text-gray-600 dark:text-gray-300'>
-                Recipes crafted by AI, personalized to perfectly align with your
-                unique dietary needs and flavor preferences
-              </p>
-            </div>
-            <Link
-              href='/recipes'
-              className='hidden md:flex items-center text-green-600 hover:text-green-700'>
-              Explore more recipes
-              <svg
-                className='w-5 h-5 ml-1'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-                xmlns='http://www.w3.org/2000/svg'>
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M9 5l7 7-7 7'></path>
-              </svg>
-            </Link>
+          <div className='flex flex-col md:flex-row items-start gap-3 mb-10'>
+            <h2 className='text-4xl font-medium text-gray-800 dark:text-gray-100'>
+              Recipes
+            </h2>
+            <div className='w-10 h-0.5 bg-gray-300 dark:bg-gray-700 hidden md:block md:translate-y-5'></div>
+            <p className='text-gray-600 dark:text-gray-300 max-w-md'>
+              Recipes crafted by AI, personalized to perfectly align with your
+              unique dietary needs and flavor preferences
+            </p>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {/* Recipe Card 1 */}
-            <div className='bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100 dark:border-gray-700'>
-              <div className='p-6 flex flex-col justify-between h-full'>
-                <div>
-                  <h3 className='text-xl font-medium mb-2'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            {/* Left Column - Recipe Cards */}
+            <div className='space-y-6'>
+              {/* Recipe Card 1 */}
+              <div className='bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-sm p-8 flex flex-col md:flex-row items-center md:items-start gap-6'>
+                <div className='flex-1'>
+                  <h3 className='text-xl font-medium text-gray-800 dark:text-gray-200 mb-3'>
                     Savory Quinoa and Roasted Vegetable Bowl
                   </h3>
-                  <p className='text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2'>
-                    A nutritious and filling bowl featuring fluffy quinoa,
-                    perfectly roasted seasonal vegetables, and a zesty herb
-                    dressing.
-                  </p>
+                  <Link
+                    href='/recipe/1'
+                    className='inline-flex items-center px-6 py-2 bg-lime-200 text-green-800 hover:bg-lime-300 rounded-full text-sm font-medium transition-colors'>
+                    Learn More
+                    <svg
+                      className='w-4 h-4 ml-1'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                      xmlns='http://www.w3.org/2000/svg'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth='2'
+                        d='M9 5l7 7-7 7'></path>
+                    </svg>
+                  </Link>
                 </div>
-                <Link
-                  href='/recipe/1'
-                  className='inline-flex items-center px-4 py-2 bg-green-100 text-green-700 hover:bg-green-200 rounded-full text-sm w-fit'>
-                  Learn More
-                  <svg
-                    className='w-4 h-4 ml-1'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                    xmlns='http://www.w3.org/2000/svg'>
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='M9 5l7 7-7 7'></path>
-                  </svg>
-                </Link>
+                <div className='w-28 h-28 relative rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-md flex-shrink-0'>
+                  <Image
+                    src="/img/receipe/victoria-shes-Qa29U4Crvn4-unsplash 1.jpg"
+                    alt="Quinoa and vegetable bowl"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Recipe Card 2 */}
-            <div className='bg-green-100 dark:bg-green-900/30 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-green-200 dark:border-green-800/50'>
-              <div className='p-6 flex flex-col justify-between h-full'>
-                <div>
-                  <h3 className='text-xl font-medium mb-2'>
+              {/* Recipe Card 2 */}
+              <div className='bg-lime-200 dark:bg-lime-900/30 rounded-3xl overflow-hidden shadow-sm p-8 flex flex-col md:flex-row items-center md:items-start gap-6'>
+                <div className='flex-1'>
+                  <h3 className='text-xl font-medium text-gray-800 dark:text-gray-200 mb-3'>
                     Herb-Infused Grilled Chicken with Seasonal Greens
                   </h3>
-                  <p className='text-gray-700 dark:text-gray-300 text-sm mb-4 line-clamp-2'>
-                    Tender chicken marinated with fresh herbs, grilled to
-                    perfection and served with a vibrant seasonal greens salad.
-                  </p>
+                  <Link
+                    href='/recipe/2'
+                    className='inline-flex items-center px-6 py-2 bg-white text-green-800 hover:bg-gray-100 rounded-full text-sm font-medium transition-colors'>
+                    Learn More
+                    <svg
+                      className='w-4 h-4 ml-1'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                      xmlns='http://www.w3.org/2000/svg'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth='2'
+                        d='M9 5l7 7-7 7'></path>
+                    </svg>
+                  </Link>
                 </div>
-                <Link
-                  href='/recipe/2'
-                  className='inline-flex items-center px-4 py-2 bg-white/70 text-green-700 hover:bg-white rounded-full text-sm w-fit'>
-                  Learn More
-                  <svg
-                    className='w-4 h-4 ml-1'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                    xmlns='http://www.w3.org/2000/svg'>
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='M9 5l7 7-7 7'></path>
-                  </svg>
-                </Link>
+                <div className='w-28 h-28 relative rounded-full overflow-hidden border-4 border-lime-100 shadow-md flex-shrink-0'>
+                  <Image
+                    src="/img/receipe/2.png"
+                    alt="Grilled chicken with greens"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Recipe Card 3 */}
-            <div className='bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700'>
-              <div className='p-6 flex flex-col justify-between h-full'>
-                <div>
-                  <h3 className='text-xl font-medium mb-2'>
+              {/* Recipe Card 3 */}
+              <div className='bg-gray-100 dark:bg-gray-800 rounded-3xl overflow-hidden shadow-sm p-8 flex flex-col md:flex-row items-center md:items-start gap-6'>
+                <div className='flex-1'>
+                  <h3 className='text-xl font-medium text-gray-800 dark:text-gray-200 mb-3'>
                     Mediterranean Lentil and Kale Salad
                   </h3>
-                  <p className='text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2'>
-                    A protein-rich salad with hearty lentils, fresh kale,
-                    Mediterranean herbs, and a tangy lemon dressing.
-                  </p>
+                  <Link
+                    href='/recipe/3'
+                    className='inline-flex items-center px-6 py-2 bg-lime-200 text-green-800 hover:bg-lime-300 rounded-full text-sm font-medium transition-colors'>
+                    Learn More
+                    <svg
+                      className='w-4 h-4 ml-1'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                      xmlns='http://www.w3.org/2000/svg'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth='2'
+                        d='M9 5l7 7-7 7'></path>
+                    </svg>
+                  </Link>
                 </div>
-                <Link
-                  href='/recipe/3'
-                  className='inline-flex items-center px-4 py-2 bg-green-100 text-green-700 hover:bg-green-200 rounded-full text-sm w-fit'>
-                  Learn More
-                  <svg
-                    className='w-4 h-4 ml-1'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                    xmlns='http://www.w3.org/2000/svg'>
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='M9 5l7 7-7 7'></path>
-                  </svg>
-                </Link>
+                <div className='w-28 h-28 relative rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-md flex-shrink-0'>
+                  <Image
+                    src="/img/receipe/3.png"
+                    alt="Mediterranean salad"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className='mt-8 text-center md:hidden'>
-            <Link
-              href='/recipes'
-              className='inline-flex items-center text-green-600 hover:text-green-700'>
-              Explore more recipes
-              <svg
-                className='w-5 h-5 ml-1'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-                xmlns='http://www.w3.org/2000/svg'>
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M9 5l7 7-7 7'></path>
-              </svg>
-            </Link>
+            {/* Right Column - Large Image */}
+            <div className='relative h-[36rem] md:h-auto rounded-3xl overflow-hidden'>
+              <div className='absolute top-6 right-6 z-10'>
+                <Link
+                  href='/recipes'
+                  className='inline-flex items-center bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-md text-gray-800 dark:text-gray-200 font-medium'>
+                  Explore more recipes
+                  <div className='w-8 h-8 bg-lime-200 rounded-full ml-3 flex items-center justify-center'>
+                    <svg
+                      className='w-4 h-4 text-gray-800'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                      xmlns='http://www.w3.org/2000/svg'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth='2'
+                        d='M9 5l7 7-7 7'></path>
+                    </svg>
+                  </div>
+                </Link>
+              </div>
+              <Image
+                src="/img/receipe/Picture.png"
+                alt="Various dishes showcase"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -416,82 +490,115 @@ export default function Home() {
         id='benefits-section'
         className='py-16 px-4 md:px-0 bg-white dark:bg-gray-900'>
         <div className='container mx-auto max-w-6xl'>
-          <div className='mb-10'>
-            <h2 className='text-3xl font-light text-gray-800 dark:text-gray-100'>
+          <div className='flex flex-col md:flex-row items-start gap-3 mb-10'>
+            <h2 className='text-4xl font-medium text-gray-800 dark:text-gray-100'>
               Benefits
             </h2>
-            <p className='text-gray-600 dark:text-gray-300'>
+            <div className='hidden md:flex items-center'>
+              <div className='w-10 h-0.5 bg-gray-300 dark:bg-gray-700 mx-4'></div>
+              <p className='text-gray-600 dark:text-gray-300 max-w-md'>
+                Get meal plans tailored to your unique dietary needs, preferences,
+                and goals, ensuring a balanced and enjoyable diet.
+              </p>
+            </div>
+            <p className='md:hidden text-gray-600 dark:text-gray-300'>
               Get meal plans tailored to your unique dietary needs, preferences,
               and goals, ensuring a balanced and enjoyable diet.
             </p>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {/* Benefit 1 */}
-            <div className='bg-green-100 dark:bg-green-900/30 rounded-3xl p-8 h-80 flex flex-col justify-center items-center text-center'>
-              <h3 className='text-xl font-medium mb-4 text-green-800 dark:text-green-300'>
-                Personalized Nutrition
-              </h3>
-              <p className='text-gray-700 dark:text-gray-300'>
-                Get meal plans tailored to your unique dietary needs,
-                preferences, and goals, ensuring a balanced and enjoyable diet.
-              </p>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12'>
+            {/* Personalized Nutrition */}
+            <div className='group relative flex flex-col overflow-hidden'>
+              <div className='rounded-full bg-lime-200 dark:bg-lime-900/30 aspect-square flex flex-col justify-center items-center text-center p-8'>
+                <h3 className='text-2xl font-medium mb-4 text-gray-800 dark:text-gray-200'>
+                  Personalized Nutrition
+                </h3>
+                <p className='text-gray-700 dark:text-gray-300 max-w-xs'>
+                  Get meal plans tailored to your unique dietary needs,
+                  preferences, and goals, ensuring a balanced and
+                  enjoyable diet.
+                </p>
+              </div>
             </div>
 
-            {/* Benefit 2 */}
-            <div className='bg-white dark:bg-gray-800 rounded-3xl p-8 h-80 flex flex-col justify-center'>
-              <h3 className='text-xl font-medium mb-4 text-gray-800 dark:text-gray-200'>
-                Time-Saving Convenience
-              </h3>
-              <p className='text-gray-600 dark:text-gray-300'>
-                Say goodbye to meal planning stress. Our AI-driven platform
-                simplifies your weekly meal preparation, saving you valuable
-                time.
-              </p>
+            {/* Time-Saving Convenience */}
+            <div className='group relative flex flex-col overflow-hidden'>
+              <div className='rounded-full bg-gray-200 dark:bg-gray-800 aspect-square flex flex-col justify-center items-center p-0'>
+                <div className='relative w-full h-full overflow-hidden rounded-full'>
+                  <Image
+                    src="/img/benefit/1.jpg"
+                    alt="Grocery bag with vegetables"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+              <div className='mt-6 text-left px-4'>
+                <h3 className='text-2xl font-medium mb-3 text-gray-800 dark:text-gray-200'>
+                  Time-Saving Convenience
+                </h3>
+                <p className='text-gray-600 dark:text-gray-300'>
+                  Say goodbye to meal planning stress. Our AI-driven platform
+                  simplifies your weekly meal preparation, saving you 
+                  valuable time.
+                </p>
+              </div>
             </div>
 
-            {/* Benefit 3 */}
-            <div className='bg-white dark:bg-gray-800 rounded-3xl p-8 h-80 flex flex-col justify-center'>
-              <h3 className='text-xl font-medium mb-4 text-gray-800 dark:text-gray-200'>
-                Healthier Eating Habits
-              </h3>
-              <p className='text-gray-600 dark:text-gray-300'>
-                Easily adopt a healthier lifestyle with nutrient-rich meal plans
-                and educational content on nutrition and wellness.
-              </p>
+            {/* Healthier Eating Habits */}
+            <div className='group relative flex flex-col overflow-hidden'>
+              <div className='rounded-full bg-gray-100 dark:bg-gray-800 aspect-square flex flex-col justify-center items-center text-center p-8'>
+                <h3 className='text-2xl font-medium mb-4 text-gray-800 dark:text-gray-200'>
+                  Healthier Eating Habits
+                </h3>
+                <p className='text-gray-700 dark:text-gray-300 max-w-xs'>
+                  Easily adopt a healthier lifestyle with nutrient-rich meal plans and
+                  educational content on nutrition and wellness.
+                </p>
+              </div>
             </div>
 
-            {/* Benefit 4 */}
-            <div className='bg-white dark:bg-gray-800 rounded-3xl p-8 h-80 flex flex-col justify-center'>
-              <h3 className='text-xl font-medium mb-4 text-gray-800 dark:text-gray-200'>
-                Cost-Effective Shopping
-              </h3>
-              <p className='text-gray-600 dark:text-gray-300'>
-                Reduce food waste and save money with efficient grocery shopping
-                lists that align perfectly with your meal plans.
-              </p>
+            {/* Cost-Effective Shopping */}
+            <div className='group relative flex flex-col overflow-hidden'>
+              <div className='rounded-full bg-gray-100 dark:bg-gray-800 aspect-square flex flex-col justify-center items-center text-center p-8'>
+                <h3 className='text-2xl font-medium mb-4 text-gray-800 dark:text-gray-200'>
+                  Cost-Effective Shopping
+                </h3>
+                <p className='text-gray-700 dark:text-gray-300 max-w-xs'>
+                  Reduce food waste and save money with efficient
+                  grocery shopping lists that align perfectly with your
+                  meal plans.
+                </p>
+              </div>
             </div>
 
-            {/* Benefit 5 */}
-            <div className='bg-white dark:bg-gray-800 rounded-3xl p-8 h-80 flex flex-col justify-center'>
-              <h3 className='text-xl font-medium mb-4 text-gray-800 dark:text-gray-200'>
-                Seamless Grocery Delivery
-              </h3>
-              <p className='text-gray-600 dark:text-gray-300'>
-                Enjoy the convenience of having all your meal ingredients
-                delivered right to your doorstep through our local grocery store
-                partnerships.
-              </p>
+            {/* Seamless Grocery Delivery */}
+            <div className='group relative flex flex-col overflow-hidden'>
+              <div className='rounded-full bg-gray-100 dark:bg-gray-800 aspect-square flex flex-col justify-center items-center text-center p-8'>
+                <h3 className='text-2xl font-medium mb-4 text-gray-800 dark:text-gray-200'>
+                  Seamless Grocery Delivery
+                </h3>
+                <p className='text-gray-700 dark:text-gray-300 max-w-xs'>
+                  Enjoy the convenience of having all your meal
+                  ingredients delivered right to your doorstep through
+                  our local grocery store partnerships.
+                </p>
+              </div>
             </div>
 
-            {/* Benefit 6 */}
-            <div className='bg-green-800 text-white rounded-3xl p-8 h-80 flex flex-col justify-center items-center text-center'>
-              <h3 className='text-xl font-medium mb-4'>Community Support</h3>
-              <p className='text-white/80'>
-                Join a community of like-minded individuals, share experiences,
-                recipes, and tips, and get motivated on your journey to
-                healthier eating.
-              </p>
+            {/* Community Support */}
+            <div className='group relative flex flex-col overflow-hidden'>
+              <div className='rounded-full bg-green-800 text-white aspect-square flex flex-col justify-center items-center text-center p-8'>
+                <h3 className='text-2xl font-medium mb-4'>
+                  Community Support
+                </h3>
+                <p className='text-white/80 max-w-xs'>
+                  Join a community of like-minded individuals, share
+                  experiences, recipes, and tips, and get motivated on
+                  your journey to healthier eating.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -645,49 +752,53 @@ export default function Home() {
       {/* Need Assistance Section */}
       <section id='support-section' className='py-16 px-4 md:px-0'>
         <div className='container mx-auto max-w-6xl'>
-          <div className='flex flex-col md:flex-row gap-6 justify-between items-center mb-10'>
-            <h2 className='text-3xl font-light text-gray-800 dark:text-gray-100'>
+          <div className='flex flex-col md:flex-row items-center gap-3 mb-8'>
+            <h2 className='text-4xl font-medium text-gray-800 dark:text-gray-100'>
               Need Assistance?
             </h2>
-            <p className='text-gray-600 dark:text-gray-300'>
+            <div className='hidden md:flex'>
+              <div className='w-8 h-0.5 bg-gray-300 dark:bg-gray-700 mx-4 translate-y-3'></div>
+              <p className='text-gray-600 dark:text-gray-300'>
+                We're here to help!
+              </p>
+            </div>
+            <p className='md:hidden text-gray-600 dark:text-gray-300'>
               We're here to help!
             </p>
           </div>
 
-          <div className='bg-white dark:bg-gray-800 rounded-3xl shadow-sm overflow-hidden'>
-            <div className='grid grid-cols-1 md:grid-cols-2'>
-              <div className='p-8 md:p-12'>
-                <div className='h-full flex items-center justify-center bg-green-100 dark:bg-green-900/30 rounded-xl overflow-hidden'>
-                  {/* This would be an image in a real application */}
-                  <div className='w-16 h-16 bg-green-600 rounded-full flex items-center justify-center text-white'>
-                    <svg
-                      className='w-8 h-8'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                      xmlns='http://www.w3.org/2000/svg'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
-                    </svg>
-                  </div>
+          <div className='mt-10 border-t border-b border-gray-100 dark:border-gray-800 py-12'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 items-center'>
+              {/* Left side - Image with curved container */}
+              <div className='relative'>
+                <div className='rounded-[40px] overflow-hidden w-full h-64 md:h-96 relative'>
+                  <Image
+                    src="/img/assistance/Picture.png"
+                    alt="Delivery person handing over groceries"
+                    fill
+                    className="object-cover"
+                    priority
+                  />
                 </div>
               </div>
 
-              <div className='p-8 md:p-12'>
-                <h3 className='text-2xl font-medium mb-4'>
+              {/* Right side - Content */}
+              <div className='flex flex-col justify-center'>
+                <h3 className='text-2xl font-medium mb-4 text-gray-800 dark:text-gray-200'>
                   Have questions or need help with Recipe AI?
                 </h3>
-                <p className='text-gray-600 dark:text-gray-300 mb-6'>
+                <p className='text-gray-600 dark:text-gray-300 mb-8 max-w-md'>
                   Our dedicated support team is ready to assist you. Get the
                   answers and assistance you need to make the most of your meal
                   planning experience.
                 </p>
-                <button className='px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full font-medium transition-colors'>
-                  Get Support
-                </button>
+                <div>
+                  <Link 
+                    href="/support"
+                    className='inline-flex items-center px-8 py-3 bg-lime-200 text-green-800 hover:bg-lime-300 rounded-full text-sm font-medium transition-colors'>
+                    Get Support
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

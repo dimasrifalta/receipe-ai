@@ -91,30 +91,30 @@ export default function RecipePage({ params }: { params: { id: string } }) {
               ? 'Loading Recipe...'
               : recipe?.title || 'Recipe Details'}
           </h1>
-          <div className='flex gap-4'>
+          <div className='flex flex-col sm:flex-row gap-3 sm:gap-4 mt-3 sm:mt-0'>
             <Link
               href='/history'
-              className='inline-flex items-center px-4 py-2 bg-transparent border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors'>
+              className='inline-flex items-center justify-center px-4 py-2 text-sm border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors'>
               Back to History
             </Link>
             <Link
-              href='/'
-              className='inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-sm transition-colors font-medium'>
+              href='/home'
+              className='inline-flex items-center justify-center px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-full shadow-sm transition-colors font-medium'>
               Generate New Recipe
             </Link>
           </div>
         </div>
 
         {isLoading ? (
-          <div className='flex justify-center items-center min-h-[400px]'>
-            <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500'></div>
+          <div className='flex justify-center items-center min-h-[300px] md:min-h-[400px]'>
+            <div className='animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-green-600'></div>
           </div>
         ) : error ? (
-          <div className='text-center p-10 bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm rounded-lg border border-red-100/60 dark:border-red-900/40'>
-            <p className='text-red-600 dark:text-red-400'>{error}</p>
+          <div className='text-center p-6 md:p-10 bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm rounded-lg border border-red-100/60 dark:border-red-900/40 mx-auto max-w-md'>
+            <p className='text-red-600 dark:text-red-400 mb-4'>{error}</p>
             <Link
               href='/history'
-              className='inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-sm transition-colors font-medium'>
+              className='inline-flex items-center justify-center px-6 py-2 md:py-3 bg-green-600 hover:bg-green-700 text-white text-sm md:text-base rounded-full shadow-sm transition-colors font-medium'>
               Back to History
             </Link>
           </div>
