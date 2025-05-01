@@ -255,7 +255,7 @@ export default function Home() {
                   <div className='mt-3'>
                     <div className='w-full h-24 md:h-32 relative'>
                       <Image
-                        src="/img/4.jpg"
+                        src="/img/header/4.jpg"
                         alt="Person with reusable grocery bag"
                         fill
                         className="object-cover rounded-lg"
@@ -276,7 +276,7 @@ export default function Home() {
                   <div className='mt-3'>
                     <div className='w-full h-24 md:h-32 relative'>
                       <Image
-                        src="/img/5.jpg"
+                        src="/img/header/5.jpg"
                         alt="Grocery bag with vegetables"
                         fill
                         className="object-cover rounded-lg"
@@ -291,7 +291,7 @@ export default function Home() {
               {/* Main food image */}
               <div className='col-span-2 rounded-xl overflow-hidden h-48 md:h-64 relative'>
                 <Image
-                  src="/img/1.jpg"
+                  src="/img/header/1.jpg"
                   alt="Delicious healthy meal"
                   fill
                   className="object-cover"
@@ -301,7 +301,7 @@ export default function Home() {
               {/* Secondary food images */}
               <div className='rounded-xl overflow-hidden h-32 md:h-48 relative'>
                 <Image
-                  src="/img/2.jpg"
+                  src="/img/header/2.jpg"
                   alt="Fresh ingredients"
                   fill
                   className="object-cover"
@@ -310,7 +310,7 @@ export default function Home() {
               
               <div className='rounded-xl overflow-hidden h-32 md:h-48 relative'>
                 <Image
-                  src="/img/7.jpg"
+                  src="/img/header/7.jpg"
                   alt="Meal preparation"
                   fill
                   className="object-cover"
